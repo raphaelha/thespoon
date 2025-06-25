@@ -1,18 +1,16 @@
 import "./globals.css";
 import { ReactNode } from "react";
-import Providers from "./Providers";
-import dynamic from "next/dynamic";
-import Navbar from "../components/Navbar";
-
+import Navbar from "../components/navigation/Navbar";
+import { ClerkProvider } from "@clerk/nextjs";
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="fr">
       <body>
-        <Providers>
-          <Navbar />
-          {children}
-        </Providers>
+          <ClerkProvider>
+            <Navbar />
+            {children}
+          </ClerkProvider>
       </body>
     </html>
   );

@@ -2,12 +2,13 @@
 
 /* === Variables système === */
 :root {
-  --color-primary: #1b3670;         /* Bleu adouci */
-  --color-secondary: #F3F4F6;       /* Gris très clair */
+  --color-secondary: #000000;         /* Noir */
+  --color-prymary: #FAFAF9;       /* Gris très clair */
   --color-accent: #10B981;          /* Vert validant */
   --color-danger: #F87171;          /* Rouge plus doux */
-  --color-bg: #FAFAF9;              /* Fond beige/gris clair */
-  --color-text: #1F2937;            /* Gris foncé lisible */
+
+  --color-text: #FAFAF9;              /* Fond beige/gris clair */
+  --color-bg: #000000;            /* Gris foncé lisible */
 
   --radius-xl: 1rem;
   --radius-2xl: 1.5rem;

@@ -1,11 +1,10 @@
 import { notFound } from "next/navigation";
 import { getCommunityById } from "@/data/getCommunityById";
-import { getServerSession } from "next-auth";
-import { UsersIcon, LinkIcon, ArrowLeftOnRectangleIcon, StarIcon, TrophyIcon } from "@heroicons/react/24/outline";
-import Image from "next/image";
 import CommunityHeader from "@/components/community/CommunityHeader";
 import CommunityTop10 from "@/components/community/CommunityTop10";
 import CommunityMembers from "@/components/community/CommunityMembers";
+import { ArrowLeftOnRectangleIcon, LinkIcon } from "@heroicons/react/24/outline";
+import { auth, currentUser } from "@clerk/nextjs/server";
 
 // Utilitaire pour les initiales
 function getInitials(name: string) {
@@ -23,11 +22,20 @@ function isTopVille(restaurantId: string) {
 }
 
 export default async function CommunityDetailPage(props: { params: { id: string } }) {
-  const { id } = await props.params;
+  const { params } = props;
+  const awaitedParams = await params;
+  const { id } = awaitedParams;
+
+  // Chargement des données côté serveur
   const community = await getCommunityById(id);
-  const session = await getServerSession();
+
+  // Récupère l'utilisateur Clerk côté serveur
+  const { userId } = await auth();
 
   if (!community) return notFound();
+
+  // Vérifie si l'utilisateur connecté appartient à la communauté
+  const isMember = !!userId && community.members.some((m: any) => m.userId === userId);
 
   // Classement des restos par moyenne des notes
   const restoStats: {
@@ -63,20 +71,15 @@ export default async function CommunityDetailPage(props: { params: { id: string 
     : community.createdAt.getTime();
   const daysAgo = Math.floor((Date.now() - lastUpdate) / (1000 * 60 * 60 * 24));
 
-  // Vérifie si l'utilisateur connecté appartient à la communauté
-  const isMember =
-    !!session &&
-    community.members.some(
-      (m: any) => m.userId === (session.user as { id?: string })?.id
-    );
-
   return (
     <main className="max-w-4xl mx-auto py-10 px-4 pt-20">
       <CommunityHeader
+        communityId={community.id}
         name={community.name}
         description={community.description ?? undefined}
         membersCount={community.members.length}
-        // Ajoute ici les handlers si besoin
+        isMember={isMember}
+        isPublic={community.isPublic}
       />
 
       {/* Classement personnalisé */}
