@@ -19,16 +19,3 @@ export async function GET() {
   }
 }
 
-export async function POST(req: NextRequest) {
-  try {
-    const data = await req.json();
-    const parsed = userSchema.safeParse(data);
-    if (!parsed.success) {
-      return NextResponse.json({ error: 'Validation échouée', details: parsed.error.errors }, { status: 400 });
-    }
-    const user = await prisma.user.create({ data: parsed.data });
-    return NextResponse.json(user);
-  } catch (error) {
-    return NextResponse.json({ error: 'Erreur lors de la création de l’utilisateur.' }, { status: 500 });
-  }
-}

@@ -3,22 +3,30 @@ import { useEffect, useRef, useState } from "react";
 import { UsersIcon } from "@heroicons/react/24/outline";
 
 export default function HeroSection({ parallaxOffset = 0 }: { parallaxOffset?: number }) {
-  const mainBtnRef = useRef<HTMLButtonElement>(null);
+  const desktopBtnRef = useRef<HTMLButtonElement>(null);
+  const mobileBtnRef = useRef<HTMLButtonElement>(null);
   const [showSticky, setShowSticky] = useState(false);
 
   useEffect(() => {
-    const btn = mainBtnRef.current;
-    if (!btn) return;
+    const desktopBtn = desktopBtnRef.current;
+    const mobileBtn = mobileBtnRef.current;
+    if (!desktopBtn && !mobileBtn) return;
+
     const observer = new window.IntersectionObserver(
-      ([entry]) => setShowSticky(!entry.isIntersecting),
+      (entries) => {
+        // Si aucun bouton n'est visible, on affiche le sticky
+        setShowSticky(!entries.some(entry => entry.isIntersecting));
+      },
       { threshold: 0.1 }
     );
-    observer.observe(btn);
+    if (desktopBtn) observer.observe(desktopBtn);
+    if (mobileBtn) observer.observe(mobileBtn);
+
     return () => observer.disconnect();
   }, []);
 
   return (
-    <section className="relative w-full h-screen font-sans bg-bg overflow-hidden">
+    <section className="relative w-full h-screen font-sans bg-black overflow-hidden">
       {/* Image en arrière-plan avec effet parallaxe */}
       <img
         src="/restaurant.jpg"
@@ -37,7 +45,7 @@ export default function HeroSection({ parallaxOffset = 0 }: { parallaxOffset?: n
       <div className="relative z-10 flex flex-col h-full justify-center px-4
         items-start text-left
         sm:items-center sm:text-center
-        pt-80 sm:pt-100
+        pt-10 sm:pt-10
       ">
         <h1 className="text-6xl sm:text-6xl md:text-6xl font-extrabold text-white mb-4 drop-shadow-lg">
           TripAdvisor c’est bien
@@ -45,10 +53,10 @@ export default function HeroSection({ parallaxOffset = 0 }: { parallaxOffset?: n
         <h2 className="text-2xl sm:text-2xl md:text-3xl font-bold text-white mb-8 drop-shadow">
           Mais t’as pas les mêmes goûts que tata Monique.
         </h2>
-        {/* Bouton visible dans le flux seulement sur desktop */}
+        {/* Bouton desktop */}
         <div className="hidden sm:block">
           <button
-            ref={mainBtnRef}
+            ref={desktopBtnRef}
             className="flex items-center gap-2 px-8 py-4 rounded-full bg-gray-100 text-[#000000] text-lg font-bold uppercase shadow-lg hover:bg-beige transition-colors"
             style={{ letterSpacing: "0.05em" }}
             onClick={() => window.location.href = "/join"}
@@ -58,10 +66,12 @@ export default function HeroSection({ parallaxOffset = 0 }: { parallaxOffset?: n
           </button>
         </div>
       </div>
-      {/* Bouton fixé en bas sur mobile */}
-      <div className="sm:hidden absolute bottom-20 left-0 w-full flex justify-center px-4">
+      {/* 
+        Bouton mobile aligné en bas de la HeroSection, qui scrolle avec le contenu
+      */}
+      <div className="absolute bottom-20 left-0 w-full flex justify-center px-4 sm:hidden z-30">
         <button
-          ref={mainBtnRef}
+          ref={mobileBtnRef}
           className="flex items-center justify-center gap-2 w-full max-w-md px-8 py-4 rounded-full bg-gray-100 text-[#000000] text-lg font-bold uppercase shadow-lg hover:bg-beige transition-colors"
           style={{ letterSpacing: "0.05em" }}
           onClick={() => window.location.href = "/join"}
@@ -70,18 +80,6 @@ export default function HeroSection({ parallaxOffset = 0 }: { parallaxOffset?: n
           Créer ta communauté
         </button>
       </div>
-      {/* Sticky bouton en bas à droite */}
-      {showSticky && (
-        <button
-          className="fixed bottom-4 right-4 z-50 flex items-center gap-2 px-5 py-3 rounded-full bg-white/90 text-[#1b3670] text-base font-bold shadow-lg border border-gray-200 hover:bg-beige transition-colors"
-          style={{ letterSpacing: "0.05em" }}
-          onClick={() => window.location.href = "/join"}
-          aria-label="Rejoindre la communauté"
-        >
-          <UsersIcon className="h-5 w-5" />
-          Rejoindre
-        </button>
-      )}
     </section>
   );
 }

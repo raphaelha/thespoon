@@ -1,15 +1,18 @@
-"use client";
-import CommunityList from "@/components/community/CommunityList";
-import VoteList from "@/components/community/VoteList";
-import AddRestaurantForm from "@/components/restaurant/AddRestaurantForm";
+import { currentUser } from "@clerk/nextjs/server";
+import { prisma } from "@/lib/prisma";
+import Top10GlobalList from "@/components/restaurant/Top10GlobalList";
+import MyCommunities from "@/components/community/MyCommunities";
+import DashboardCard from "@/components/layout/DashboardCard";
 
-export default function DashboardPage() {
-  return (
-    <div className="max-w-4xl mx-auto px-4 py-10 font-sans">
-      <h1 className="text-3xl font-bold mb-8 text-text">Mon tableau de bord</h1>
-      <CommunityList />
-      <VoteList />
-      <AddRestaurantForm />
-    </div>
-  );
+export default async function DashboardPage() {
+   
+
+    return (
+        <div className="max-w-4xl mx-auto font-sans">
+            <DashboardCard>
+                <Top10GlobalList />
+                <MyCommunities />
+            </DashboardCard>
+        </div>
+    );
 }

@@ -33,7 +33,7 @@ export default function CommunityCard({ community }: { community: Community }) {
             alt={community.name}
             className="w-12 h-12 rounded-full border-2 border-primary/60 shadow"
           />
-          <span className="absolute -bottom-1 -right-1 bg-primary text-white rounded-full px-2 py-0.5 text-xs font-bold shadow ring-2 ring-white">
+          <span className="absolute -bottom-1 -right-1 bg-primary text-black rounded-full px-2 py-0.5 text-xs font-bold shadow ring-2 ring-white">
             {members.length}
           </span>
         </div>
@@ -54,7 +54,7 @@ export default function CommunityCard({ community }: { community: Community }) {
 
       {/* Badges */}
       <div className="flex items-center gap-2 text-xs mt-1">
-        <span className="flex items-center gap-1 bg-primary/10 text-primary px-2 py-0.5 rounded-full font-semibold">
+        <span className="flex items-center gap-1 bg-primary/10 text-secondary px-2 py-0.5 rounded-full font-semibold">
           <UsersIcon className="h-4 w-4" />
           {members.length} membre{members.length > 1 ? "s" : ""}
         </span>
@@ -68,7 +68,7 @@ export default function CommunityCard({ community }: { community: Community }) {
       <div className="flex justify-end mt-2">
         <Link
           href={`/community/${community.id}`}
-          className="inline-flex items-center gap-1 px-4 py-2 rounded-lg bg-primary text-white font-semibold text-xs hover:bg-blue-700 transition shadow group-hover:scale-105"
+          className="inline-flex items-center gap-1 px-4 py-2 rounded-lg bg-primary text-secondary font-semibold text-xs hover:bg-blue-700 transition shadow group-hover:scale-105"
         >
           <span>Voir</span>
           <svg

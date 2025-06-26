@@ -3,14 +3,14 @@ import { ReactNode } from "react";
 import Navbar from "../components/navigation/Navbar";
 import { ClerkProvider } from "@clerk/nextjs";
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="fr">
       <body>
-          <ClerkProvider>
-            <Navbar />
+        <ClerkProvider>
+          <Navbar />
             {children}
-          </ClerkProvider>
+        </ClerkProvider>
       </body>
     </html>
   );

@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
     if (event.type === "user.created") {
       const user = event.data;
       await prisma.user.upsert({
-        where: { id: user.id },
+        where: { clerkId: user.id },
         update: {
           email: user.email_addresses?.[0]?.email_address ?? null,
           firstName: user.first_name ?? null,
@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
           image: user.image_url ?? null,
         },
         create: {
-          id: user.id,
+          clerkId: user.id,
           email: user.email_addresses?.[0]?.email_address ?? null,
           firstName: user.first_name ?? null,
           lastName: user.last_name ?? null,

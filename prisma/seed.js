@@ -1,4 +1,7 @@
-import { PrismaClient } from '@prisma/client';
+// @ts-nocheck
+const { PrismaClient } = require('@prisma/client');
+const { randomUUID } = require('crypto');
+
 const prisma = new PrismaClient();
 
 async function main() {
@@ -19,31 +22,22 @@ async function main() {
       { name: 'Les testeurs fous', code: 'testeurs', description: 'On teste tout, partout', isPublic: true },
     ],
   });
+
   console.log('✅ Communautés créées');
 
   // --- Utilisateurs ---
   const usersData = [
-    { firstName: 'Alice', lastName: 'Martin', pseudo: 'alice', email: 'alice@example.com', image: null },
-    { firstName: 'Bob', lastName: 'Durand', pseudo: 'bob', email: 'bob@example.com', image: null },
-    { firstName: 'Chloé', lastName: 'Dupont', pseudo: 'chloe', email: 'chloe@example.com', image: null },
-    { firstName: 'David', lastName: 'Bernard', pseudo: 'david', email: 'david@example.com', image: null },
-    { firstName: 'Emma', lastName: 'Petit', pseudo: 'emma', email: 'emma@example.com', image: null },
-    { firstName: 'Lucas', lastName: 'Girard', pseudo: 'lucas', email: 'lucas@example.com', image: null },
-    { firstName: 'Sophie', lastName: 'Lefevre', pseudo: 'sophie', email: 'sophie@example.com', image: null },
-    { firstName: 'Hugo', lastName: 'Moreau', pseudo: 'hugo', email: 'hugo@example.com', image: null },
-    { firstName: 'Léa', lastName: 'Roux', pseudo: 'lea', email: 'lea@example.com', image: null },
-    { firstName: 'Maxime', lastName: 'Faure', pseudo: 'maxime', email: 'maxime@example.com', image: null },
-    { firstName: 'Julie', lastName: 'Garnier', pseudo: 'julie', email: 'julie@example.com', image: null },
-    { firstName: 'Antoine', lastName: 'Perrin', pseudo: 'antoine', email: 'antoine@example.com', image: null },
-    { firstName: 'Camille', lastName: 'Blanc', pseudo: 'camille', email: 'camille@example.com', image: null },
-    { firstName: 'Nina', lastName: 'Lopez', pseudo: 'nina', email: 'nina@example.com', image: null },
-    { firstName: 'Paul', lastName: 'Henry', pseudo: 'paul', email: 'paul@example.com', image: null },
-    { firstName: 'Sarah', lastName: 'Marchand', pseudo: 'sarah', email: 'sarah@example.com', image: null },
-    { firstName: 'Tom', lastName: 'Robin', pseudo: 'tom', email: 'tom@example.com', image: null },
-    { firstName: 'Manon', lastName: 'Guerin', pseudo: 'manon', email: 'manon@example.com', image: null },
-    { firstName: 'Louis', lastName: 'Benoit', pseudo: 'louis', email: 'louis@example.com', image: null },
-    { firstName: 'Clara', lastName: 'Meyer', pseudo: 'clara', email: 'clara@example.com', image: null },
-  ];
+    'alice', 'bob', 'chloe', 'david', 'emma', 'lucas', 'sophie', 'hugo', 'lea', 'maxime',
+    'julie', 'antoine', 'camille', 'nina', 'paul', 'sarah', 'tom', 'manon', 'louis', 'clara',
+  ].map((pseudo) => ({
+    pseudo,
+    firstName: pseudo.charAt(0).toUpperCase() + pseudo.slice(1),
+    lastName: 'User',
+    email: `${pseudo}@example.com`,
+    image: null,
+    clerkId: randomUUID(),
+  }));
+
   await prisma.user.createMany({ data: usersData });
   console.log('✅ Utilisateurs créés');
 
@@ -136,4 +130,6 @@ main()
     console.error('❌ Erreur lors du seed :', e);
     process.exit(1);
   })
-  .finally(() => prisma.$disconnect());
+  .finally(async () => {
+    await prisma.$disconnect();
+  });

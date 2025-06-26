@@ -7,7 +7,7 @@
   --color-accent: #10B981;          /* Vert validant */
   --color-danger: #F87171;          /* Rouge plus doux */
 
-  --color-text: #FAFAF9;              /* Fond beige/gris clair */
+  --color-text: #000000;              /* Fond beige/gris clair */
   --color-bg: #000000;            /* Gris foncé lisible */
 
   --radius-xl: 1rem;
