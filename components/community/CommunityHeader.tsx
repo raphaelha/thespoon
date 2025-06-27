@@ -72,8 +72,8 @@ export default function CommunityHeader({
 
   return (
     <>
-      <section className="flex flex-col sm:flex-row items-center gap-6 mb-10">
-        <div className="w-20 h-20 rounded-full bg-primary flex items-center justify-center text-white text-3xl font-bold shadow">
+      <section className="flex flex-col sm:flex-row items-center gap-6 mb-2">
+        <div className="w-20 h-20 rounded-full bg-primary flex items-center justify-center text-primary text-3xl font-bold shadow">
           {name ? getInitials(name) : <UsersIcon className="h-10 w-10" />}
         </div>
         <div className="flex-1">
@@ -94,7 +94,7 @@ export default function CommunityHeader({
                 Quitter la communauté
               </button>
               <button
-                className="px-5 py-2 rounded-2xl bg-green-600 text-white font-bold shadow hover:bg-green-700 transition"
+                className="px-5 py-2 rounded-2xl bg-green-600 text-red font-bold shadow hover:bg-green-700 transition"
                 onClick={handleAddRestaurant}
               >
                 Noter un nouveau restaurant
@@ -102,7 +102,7 @@ export default function CommunityHeader({
             </>
           ) : (
             <button
-              className="px-5 py-2 rounded-2xl bg-primary text-white font-bold shadow hover:bg-blue-700 transition"
+              className="px-5 py-2 rounded-2xl bg-primary text-red font-bold shadow hover:bg-blue-700 transition"
               onClick={handleJoin}
               disabled={!isPublic}
             >
@@ -110,7 +110,7 @@ export default function CommunityHeader({
             </button>
           )}
           <button
-            className="px-5 py-2 rounded-2xl bg-secondary text-primary font-bold shadow hover:bg-yellow-300 transition flex items-center gap-2"
+            className="px-5 py-2 rounded-2xl bg-secondary text-white font-bold shadow hover:bg-yellow-300 transition flex items-center gap-2"
             onClick={onShare}
           >
             <LinkIcon className="h-5 w-5" />

@@ -1,39 +1,62 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import type { Restaurant } from "@/types/prisma";
-import { getTotalVotes, getAverageVote } from "@/utils/restaurantUtils";
 
 type Props = {
   resto: Restaurant;
   idx: number;
-  badge?: React.ReactNode;
   highlight?: boolean;
   onClick?: () => void;
+  totalVotes: number;
+  totalScore: number;
+  averageVote?: number;
+  wilsonScore: number;
 };
 
-export default function RestaurantListItem({
-  resto,
-  idx,
-  badge,
-  highlight = false,
-  onClick,
-}: Props) {
-  const [totalVotes, setTotalVotes] = useState<number | null>(null);
-  const [averageVote, setAverageVote] = useState<number | null>(null);
+function getRankBadge(idx: number) {
+  if (idx === 0)
+    return (
+      <span className="inline-flex items-center justify-center w-8 h-8 rounded-full border-2 border-yellow-400 text-yellow-600 font-bold text-lg shadow bg-white">
+        1
+      </span>
+    );
+  if (idx === 1)
+    return (
+      <span className="inline-flex items-center justify-center w-8 h-8 rounded-full border-2 border-gray-400 text-gray-600 font-bold text-lg shadow bg-white">
+        2
+      </span>
+    );
+  if (idx === 2)
+    return (
+      <span className="inline-flex items-center justify-center w-8 h-8 rounded-full border-2 border-amber-700 text-amber-700 font-bold text-lg shadow bg-white">
+        3
+      </span>
+    );
+  // Pour les rangs > 3, badge simple sans couleur particulière
+  return (
+    <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-300 text-white font-bold text-lg shadow">
+      {idx + 1}
+    </span>
+  );
+}
 
-  useEffect(() => {
-    async function fetchVotes() {
-      const total = await getTotalVotes(resto);
-      const avg = await getAverageVote(resto);
-      setTotalVotes(total);
-      setAverageVote(avg);
-    }
-    fetchVotes();
-  }, [resto]);
+export default function RestaurantListItem(props: Props) {
+  const {
+    resto,
+    idx,
+    highlight = false,
+    onClick,
+    totalVotes,
+    totalScore,
+    averageVote
+  } = props;
+
+  // Si averageVote n'est pas passé, on le calcule
+  const avg = averageVote ?? (totalVotes > 0 ? totalScore / totalVotes : null);
 
   return (
-    <li
+    <div
       className={`
         flex items-center justify-between px-4 py-3 rounded-xl
         ${highlight ? "bg-blue-50/70" : "bg-white border border-gray-100 shadow"}
@@ -42,32 +65,20 @@ export default function RestaurantListItem({
       onClick={onClick}
     >
       <div className="flex items-center gap-3 min-w-0">
-        {badge ? (
-          badge
-        ) : (
-          <span className="inline-block w-8 h-8 rounded-full flex items-center justify-center bg-gray-200 text-gray-700 font-bold text-lg shadow">
-            {idx}
-          </span>
-        )}
+        {getRankBadge(idx)}
         <div className="flex flex-col min-w-0">
           <span className="font-semibold text-base sm:text-lg truncate">{resto.name}</span>
           <span className="text-xs text-gray-500 truncate">{resto.city || resto.address}</span>
         </div>
       </div>
-      <span className="font-bold text-lg sm:text-xl flex items-center gap-1 text-primary">
-        {totalVotes !== null && totalVotes > 0 ? (
-          <>
-            <svg className="w-5 h-5 text-primary" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M3 11.5A7.5 7.5 0 0110.5 4a7.5 7.5 0 017.5 7.5c0 4.142-3.358 7.5-7.5 7.5S3 15.642 3 11.5z" />
-            </svg>
-            {totalVotes}
-          </>
-        ) : averageVote !== null && averageVote > 0 ? (
-          <span className="text-xl font-extrabold text-blue-700">{averageVote.toFixed(1)}/5</span>
-        ) : (
-          "-"
-        )}
-      </span>
-    </li>
+      <div className="flex flex-col items-end min-w-[70px]">
+        <span className="font-bold text-xl sm:text-2xl text-primary">
+          {avg !== null ? `${avg.toFixed(1)}/5` : "N/A"}
+        </span>
+        <span className="text-xs text-gray-500">
+          {totalVotes} vote{totalVotes > 1 ? "s" : ""}
+        </span>
+      </div>
+    </div>
   );
 }

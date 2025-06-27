@@ -1,6 +1,7 @@
 // lib/auth.ts
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
+import { rankRestaurantsByWilson } from "@/utils/restaurantsUtils";
 
 /**
  * Récupère les communautés, restaurants et votes associés à l'utilisateur courant
@@ -9,7 +10,6 @@ import { prisma } from "@/lib/prisma";
  */
 export async function getUserGlobalRestaurantRankingForCurrentUser() {
   const { userId } = await auth();
-  console.log("[RANKING] userId:", userId);
   if (!userId) return [];
 
   const userWithCommunities = await prisma.user.findUnique({
@@ -29,47 +29,30 @@ export async function getUserGlobalRestaurantRankingForCurrentUser() {
     },
   });
 
-  console.log(
-    "[RANKING] userWithCommunities:",
-    JSON.stringify(userWithCommunities, null, 2)
-  );
-
   if (!userWithCommunities) return [];
 
   const communities = userWithCommunities.memberships.map((m) => m.community);
-  console.log("[RANKING] communities.length:", communities.length);
 
+  // On cumule la somme des notes et le nombre de votes pour chaque restaurant
   const restaurantMap = new Map<
     string,
-    { restaurant: any; totalVotes: number }
+    { restaurant: any; totalScore: number; totalVotes: number }
   >();
 
   for (const community of communities) {
-    console.log(
-      `[RANKING] community ${community.id} votes:`,
-      community.votes.length
-    );
     for (const vote of community.votes) {
       const resto = vote.restaurant;
       if (!resto) continue;
       if (!restaurantMap.has(resto.id)) {
-        restaurantMap.set(resto.id, { restaurant: resto, totalVotes: 0 });
+        restaurantMap.set(resto.id, { restaurant: resto, totalScore: 0, totalVotes: 0 });
       }
+      restaurantMap.get(resto.id)!.totalScore += vote.note ?? 0;
       restaurantMap.get(resto.id)!.totalVotes += 1;
     }
   }
 
-  console.log("[RANKING] restaurantMap:", Array.from(restaurantMap.entries()));
-
-  const ranked = Array.from(restaurantMap.values())
-    .sort((a, b) => b.totalVotes - a.totalVotes)
-    .map((entry, idx) => ({
-      ...entry.restaurant,
-      totalVotes: entry.totalVotes,
-      rank: idx + 1,
-    }));
-
-  console.log("[RANKING] ranked:", ranked);
+  // Utilisation de la fonction factorisée
+  const ranked = rankRestaurantsByWilson(Array.from(restaurantMap.values()));
 
   return ranked;
 }

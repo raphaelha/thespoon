@@ -23,7 +23,7 @@ export default function CommunityCard({ community }: { community: Community }) {
   return (
     <div className="bg-white border border-gray-100 rounded-2xl shadow-md hover:shadow-xl hover:border-primary/40 hover:-translate-y-1 transition-all p-5 flex flex-col gap-3 group relative overflow-hidden">
       {/* Anneau coloré animé */}
-      <div className="absolute -top-6 -right-6 w-24 h-24 bg-primary/10 rounded-full blur-2xl opacity-60 group-hover:opacity-80 transition" />
+      <div className="absolute -top-6 -right-6 w-24 h-24 bg-secondary/10 rounded-full blur-2xl opacity-60 group-hover:opacity-80 transition" />
       
       {/* Header */}
       <div className="flex items-center gap-4 mb-1">
@@ -31,7 +31,7 @@ export default function CommunityCard({ community }: { community: Community }) {
           <img
             src={getAvatarUrl(community.name)}
             alt={community.name}
-            className="w-12 h-12 rounded-full border-2 border-primary/60 shadow"
+            className="w-12 h-12 rounded-full border-2 border-secondary/60 shadow"
           />
           <span className="absolute -bottom-1 -right-1 bg-primary text-black rounded-full px-2 py-0.5 text-xs font-bold shadow ring-2 ring-white">
             {members.length}

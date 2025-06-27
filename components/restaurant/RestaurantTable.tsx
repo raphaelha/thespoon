@@ -1,6 +1,5 @@
 import { useRouter } from "next/router";
 import type { Restaurant, Vote } from "@/types/prisma";
-import { getTotalVotes, getAverageVote } from "@/utils/restaurantUtils";
 
 export default function RestaurantTable({
   restaurants,
@@ -34,12 +33,10 @@ export default function RestaurantTable({
               <td className="px-4 py-3">{resto.name}</td>
               <td className="px-4 py-3">{resto.address ?? resto.city}</td>
               <td className="px-4 py-3 text-center">
-                {resto.votes && resto.votes.length > 0
-                  ? getAverageVote(resto)
-                  : "-"}
+              
               </td>
               <td className="px-4 py-3 text-center">
-                {resto.votes ? getTotalVotes(resto) : "-"}
+         
               </td>
             </tr>
           ))}

@@ -1,108 +1,56 @@
-import { notFound } from "next/navigation";
-import { getCommunityById } from "@/data/getCommunityById";
+"use client";
+
+import { useEffect, useState } from "react";
+import { notFound, useParams } from "next/navigation";
 import CommunityHeader from "@/components/community/CommunityHeader";
-import CommunityTop10 from "@/components/community/CommunityTop10";
+import CommunityTop from "@/components/community/CommunityTop";
 import CommunityMembers from "@/components/community/CommunityMembers";
 import { ArrowLeftOnRectangleIcon, LinkIcon } from "@heroicons/react/24/outline";
-import { auth, currentUser } from "@clerk/nextjs/server";
+import DashboardCard from "@/components/layout/DashboardCard";
 
-// Utilitaire pour les initiales
-function getInitials(name: string) {
-  return name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
-}
 
-// Simule le top ville (à remplacer par une vraie logique)
-function isTopVille(restaurantId: string) {
-  return Math.random() > 0.7;
-}
+export default function CommunityDetailPage() {
+  const { id } = useParams<{ id: string }>();
+  const [community, setCommunity] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-export default async function CommunityDetailPage(props: { params: { id: string } }) {
-  const { params } = props;
-  const awaitedParams = await params;
-  const { id } = awaitedParams;
+  useEffect(() => {
+    if (!id) return;
+    setLoading(true);
+    fetch(`/api/community/${id}`)
+      .then((res) => res.json())
+      .then((data) => setCommunity(data))
+      .finally(() => setLoading(false));
+  }, [id]);
 
-  // Chargement des données côté serveur
-  const community = await getCommunityById(id);
+  if (!loading && (!community || community.error)) return notFound();
 
-  // Récupère l'utilisateur Clerk côté serveur
-  const { userId } = await auth();
+  // Ici, tu peux ajouter la logique pour détecter si l'utilisateur est membre (ex: via un autre fetch ou context utilisateur)
+  // Pour l'exemple, on suppose que tu n'as pas cette info côté client
+  const isMember = true; // À adapter selon ton auth
 
-  if (!community) return notFound();
-
-  // Vérifie si l'utilisateur connecté appartient à la communauté
-  const isMember = !!userId && community.members.some((m: any) => m.userId === userId);
-
-  // Classement des restos par moyenne des notes
-  const restoStats: {
-    id: string;
-    name: string;
-    avg: number;
-    votes: number;
-  }[] = [];
-  const restoMap: Record<string, { total: number; count: number; name: string }> = {};
-
-  for (const vote of community.votes) {
-    if (!restoMap[vote.restaurantId]) {
-      restoMap[vote.restaurantId] = { total: 0, count: 0, name: vote.restaurant.name };
-    }
-    restoMap[vote.restaurantId].total += vote.note;
-    restoMap[vote.restaurantId].count += 1;
-  }
-  for (const [id, { total, count, name }] of Object.entries(restoMap)) {
-    restoStats.push({ id, name, avg: total / count, votes: count });
-  }
-  restoStats.sort((a, b) => b.avg - a.avg);
-  const top10 = restoStats.slice(0, 10);
-
-  // Score total par membre
-  const memberScores: Record<string, number> = {};
-  for (const vote of community.votes) {
-    memberScores[vote.userId] = (memberScores[vote.userId] || 0) + vote.note;
-  }
-
-  // Date de dernière maj du classement
-  const lastUpdate = community.votes.length
-    ? Math.max(...community.votes.map((v) => v.createdAt.getTime()))
-    : community.createdAt.getTime();
-  const daysAgo = Math.floor((Date.now() - lastUpdate) / (1000 * 60 * 60 * 24));
+  // Les scores membres ne sont plus calculés ici, mais tu peux les charger via une autre API si besoin
 
   return (
-    <main className="max-w-4xl mx-auto py-10 px-4 pt-20">
-      <CommunityHeader
-        communityId={community.id}
-        name={community.name}
-        description={community.description ?? undefined}
-        membersCount={community.members.length}
-        isMember={isMember}
-        isPublic={community.isPublic}
-      />
-
-      {/* Classement personnalisé */}
-      <CommunityTop10 top10={top10} daysAgo={daysAgo} isTopVille={isTopVille} />
-
-      {/* Membres : visible uniquement si connecté ET membre */}
-      {isMember && (
-        <CommunityMembers members={community.members} memberScores={memberScores} />
-      )}
-
-      {/* CTA quitter/inviter : visible uniquement si connecté ET membre */}
-      {isMember && (
-        <section className="flex gap-3 mt-8">
-          <button className="px-5 py-2 rounded-2xl bg-danger text-white font-bold shadow hover:bg-red-600 transition flex items-center gap-2">
-            <ArrowLeftOnRectangleIcon className="h-5 w-5" />
-            Quitter la communauté
-          </button>
-          <button className="px-5 py-2 rounded-2xl bg-secondary text-primary font-bold shadow hover:bg-yellow-300 transition flex items-center gap-2">
-            <LinkIcon className="h-5 w-5" />
-            Inviter via lien
-          </button>
-        </section>
-      )}
-    </main>
+    <div className="max-w-4xl mx-auto font-sans">
+      <DashboardCard>
+        {loading ? (
+          <div className="p-8 text-center text-text/60">Chargement…</div>
+        ) : (
+          <>
+            <CommunityHeader
+              communityId={community.id}
+              name={community.name}
+              description={community.description ?? undefined}
+              membersCount={community.membersCount ?? 0}
+              isMember={isMember}
+              isPublic={community.isPublic}
+            />
+            <CommunityTop communityId={community.id} />
+            <CommunityMembers communityId={community.id} memberScores={{}} />
+          </>
+        )}
+      </DashboardCard>
+    </div>
   );
 }

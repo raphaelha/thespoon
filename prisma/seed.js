@@ -102,7 +102,7 @@ async function main() {
     });
 
     for (const member of members) {
-      const votedRestoIds = new Set<string>();
+      const votedRestoIds = new Set();
 
       for (let i = 0; i < Math.floor(Math.random() * 5) + 1; i++) {
         const resto = restos[Math.floor(Math.random() * restos.length)];
